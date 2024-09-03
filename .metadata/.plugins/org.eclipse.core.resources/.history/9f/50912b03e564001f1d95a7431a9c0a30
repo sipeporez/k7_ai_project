@@ -1,0 +1,27 @@
+package com.motorPM.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.motorPM.domain.Member;
+import com.motorPM.service.LoginService;
+
+import lombok.RequiredArgsConstructor;
+
+@Controller
+@RestController
+@RequiredArgsConstructor
+public class LoginController {
+	
+	private final LoginService ls;
+	
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody Member m) {
+		if (ls.login(m) != null) return ResponseEntity.ok().body("로그인 성공");
+		else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
+	}
+}

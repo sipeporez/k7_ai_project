@@ -1,0 +1,70 @@
+package com.motorPM.service;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.motorPM.domain.dto.SigdataDTO;
+import com.motorPM.persistence.MemberRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class ChartService {
+
+	private final MemberRepository mr;
+
+	public List<SigdataDTO> getSigdata(Object sig) {
+
+		ObjectMapper mapper = new ObjectMapper();
+		// Object를 JsonNode로 변환
+		JsonNode jsonData = mapper.convertValue(sig, JsonNode.class);
+
+		String asset_name = jsonData.path("asset_name").asText();
+		int startTime = jsonData.path("start_at").asInt();
+		int endTime = jsonData.path("end_at").asInt();
+
+		// cols 배열을 추출
+		JsonNode colsNode = jsonData.path("cols");
+
+		// cols 배열의 각 요소를 String으로 변환
+		List<String> colsList = StreamSupport
+				.stream(colsNode.spliterator(), false)
+				.map(col -> col.asText()) // 각
+				.collect(Collectors.toList());
+		// 변환된 결과를 문자열로 변환
+		String colsString = String.join(", ", colsList);
+
+		System.out.println("\n에셋이름 : " + asset_name + "\n시작시간 : " + startTime + "\n종료시간 : " + endTime);
+		System.out.println("컬럼들 : " + colsString);
+		
+		String query = "SELECT ";
+				query += String.join(", ", colsList);
+				query += " FROM ics_asset_sigdata sg, ics_asset_mst mst ";
+				+ " WHERE sg.asset_id = mst.asset_id "
+				+ " AND mst.asset_name = :asset_name "
+				+ " AND created_at BETWEEN :start_time AND :end_time;")
+					query += " FROM passenger_count pc, station_list sl ";
+					query += "WHERE pc.station_no = sl.station_no and pc.station_no = ";
+					query += station_no;
+					query += " AND pc.date in (";
+					for (Date d : dates) {query +="'" + formatter.format(d) + "', ";}
+					query = query.substring(0,query.length()-2);
+					query += ")";
+			Query sql = em.createNativeQuery(query);
+
+		
+
+
+		return sigdataList;
+
+	}
+
+}

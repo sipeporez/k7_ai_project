@@ -1,0 +1,18 @@
+package com.motorPM.controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import com.motorPM.domain.dto.SigdataDTO;
+
+@Controller
+public class ChartController {
+
+	@PostMapping("/chart")
+	public ResponseEntity<?> getSigdata(@RequestBody SigdataDTO) {
+		return ResponseEntity.ok(null)	
+				
+	}
+}

@@ -1,0 +1,26 @@
+package com.motorPM.domain.dto;
+
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+
+@Getter @Setter @ToString
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class TestFlaskDataDTO {
+	
+	private Integer id;
+
+	@JsonProperty("date")
+	private Date date;
+
+}

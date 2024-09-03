@@ -1,0 +1,28 @@
+package com.motorPM.service;
+
+import java.util.Optional;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.motorPM.domain.Member;
+import com.motorPM.persistence.MemberRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class LoginService {
+	
+	private final MemberRepository mr;
+	private final PasswordEncoder enc;
+	
+	public Member login(Member m) {
+		Optional<Member> mem = mr.findByUserid(m.getUserid());
+		if(mem.isPresent() && enc.matches(m.getPassword(), mem.get().getPassword())) {
+			return mem.get();
+		}
+		else return null;
+	}
+
+}

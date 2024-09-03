@@ -1,0 +1,30 @@
+package com.motorPM.controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.motorPM.service.PMFlaskService;
+
+import lombok.RequiredArgsConstructor;
+
+
+@Controller
+@RequiredArgsConstructor
+public class PMFlaskController {
+	private final PMFlaskService pmfs;
+	
+	@GetMapping("/flask")
+	public ResponseEntity<?> flaskTest() throws JsonProcessingException {
+		return ResponseEntity.ok(pmfs.flasktest()); 
+	}
+	
+	@GetMapping("/")
+	public ResponseEntity<?> index() {
+		return ResponseEntity.ok("인덱스"); 
+	}
+	
+
+}

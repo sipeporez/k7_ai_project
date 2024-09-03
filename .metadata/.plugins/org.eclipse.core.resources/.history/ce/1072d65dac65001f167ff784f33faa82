@@ -1,0 +1,27 @@
+package com.motorPM.persistence;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.motorPM.domain.Member;
+
+public interface MemberRepository extends JpaRepository<Member, Integer> {
+	
+	@Query("SELECT m FROM Member m WHERE m.userid = :userid")
+    Optional<Member> findByUserid(@Param("userid") String userid);
+	
+	@Query(nativeQuery = true, 
+			value = "SELECT * "
+					+ "FROM ics_asset_sigdata sg, ics_asset_mst mst "
+					+ "WHERE sg.asset_id = mst.asset_id "
+					+ "AND mst.asset_name = :asset_name "
+					+ "AND created_at BETWEEN 1704040840 AND 1804048050;")
+	List<Object[]> getStationDataByDate(
+			@Param(value= "asset_name") String asset_name);
+	
+	
+}

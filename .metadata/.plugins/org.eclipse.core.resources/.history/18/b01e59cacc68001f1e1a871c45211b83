@@ -1,0 +1,5 @@
+package com.motorPM.config;
+
+public class WebSocketConfig {
+
+}

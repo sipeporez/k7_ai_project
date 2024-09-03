@@ -1,0 +1,56 @@
+package com.motorPM.service;
+
+import java.util.List;
+
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import com.motorPM.config.WebSocketConfig;
+import com.motorPM.domain.DTO.AssetIDDTO;
+import com.motorPM.domain.DTO.RealtimeDTO;
+import com.motorPM.persistence.MemberRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+@EnableScheduling
+public class WebSocketService {
+
+	private final MemberRepository mr;
+    private final WebSocketConfig wc;
+    private List<Object[]> results;
+    private int index;
+
+    public void sendQueryResults(AssetIDDTO dto) {
+        // SQL 쿼리 결과를 저장
+    	results = mr.realDataResult(dto.getAsset_id());
+    	index = 0;
+    }
+    
+    public void initResult() {
+    	result = null;
+    	index = 0;
+    }
+    
+    @Scheduled(fixedRate = 1000)
+    public void getResults() {
+    	if (results == null || results.isEmpty()) {
+            return; // 결과가 없으면 작업 종료
+        }
+		if (index < results.size()) {
+			Object[] result = results.get(index);
+        		wc.sendPushMessage(
+        				RealtimeDTO.builder()
+                		.asset_id(result[0].toString())
+                		.created_at((Integer) result[1])
+                		.spectrum_x((Float) result[2])
+                		.spectrum_y((Float) result[3])
+                		.spectrum_z((Float) result[4])
+                		.build());
+            index++;
+        }
+		else index = 0;
+    }
+}

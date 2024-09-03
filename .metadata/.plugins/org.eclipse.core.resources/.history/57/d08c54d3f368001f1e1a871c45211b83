@@ -1,0 +1,62 @@
+package com.motorPM.service;
+
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.springframework.stereotype.Service;
+
+import com.motorPM.config.WebSocketConfig;
+import com.motorPM.domain.DTO.AssetIDDTO;
+import com.motorPM.domain.DTO.RealtimeDTO;
+import com.motorPM.persistence.MemberRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class WebSocketService {
+
+	private final MemberRepository mr;
+    private final WebSocketConfig wc;
+
+    private Timer timer;
+
+    public void sendQueryResults(AssetIDDTO dto) {
+    	
+    	// 이전 Timer가 있다면 취소하고 null로 설정
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+
+        // 새로운 Timer 생성
+        timer = new Timer();
+
+        List<Object[]> results = mr.realDataResult(dto.getAsset_id()); // Replace with actual query method
+
+        TimerTask task = new TimerTask() {
+            private int index = 0;
+
+            @Override
+            public void run() {
+                if (index < results.size()) {
+                		wc.sendPushMessage(
+                				RealtimeDTO.builder()
+                        		.asset_id(result[0].toString())
+                        		.created_at((Integer) result[1])
+                        		.spectrum_x((Float) result[2])
+                        		.spectrum_y((Float) result[3])
+                        		.spectrum_z((Float) result[4])
+                        		.build());
+                    // Assuming you have a way to get a WebSocket session
+                    index++;
+                } else {
+                    timer.cancel();
+                }
+            }
+        };
+
+        timer.scheduleAtFixedRate(task, 0, 1000); // Schedule task with 1-second interval
+    }
+}

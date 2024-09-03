@@ -1,0 +1,5 @@
+package com.motorPM.config.emul;
+
+public class ReportDTO {
+
+}

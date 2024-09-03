@@ -1,0 +1,60 @@
+package com.motorPM.domain;
+
+import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Entity
+@Builder
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+public class Sigdata {
+	private float temperature;
+	private float voltage;
+	private float rms_x;
+	private float rms_y;
+	private float rms_z;
+	private float rms_xyz;
+	private float vel_rms_x;
+	private float vel_rms_y;
+	private float vel_rms_z;
+	private float vel_rms_xyz;
+	private float skewness_x;
+	private float skewness_y;
+	private float skewness_z;
+	private float vel_skewness_x;
+	private float vel_skewness_y;
+	private float vel_skewness_z;
+	private float kurtosis_x;
+	private float kurtosis_y;
+	private float kurtosis_z;
+	private float vel_kurtosis_x;
+	private float vel_kurtosis_y;
+	private float vel_kurtosis_z;
+	private float crest_factor_x;
+	private float crest_factor_y;
+	private float crest_factor_z;
+	private float vel_crest_factor_x;
+	private float vel_crest_factor_y;
+	private float vel_crest_factor_z;
+	private float peak_x;
+	private float peak_y;
+	private float peak_z;
+	private float vel_peak_x;
+	private float vel_peak_y;
+	private float vel_peak_z;
+	private float peak2peak_x;
+	private float peak2peak_y;
+	private float peak2peak_z;
+	private float vel_peak2peak_x;
+	private float vel_peak2peak_y;
+	private float vel_peak2peak_z;
+
+}

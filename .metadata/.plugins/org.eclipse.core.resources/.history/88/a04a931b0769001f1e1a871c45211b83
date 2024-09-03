@@ -1,0 +1,51 @@
+package com.motorPM.service;
+
+import java.util.List;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import com.motorPM.config.WebSocketConfig;
+import com.motorPM.domain.DTO.AssetIDDTO;
+import com.motorPM.domain.DTO.RealtimeDTO;
+import com.motorPM.persistence.MemberRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class WebSocketService {
+
+	private final MemberRepository mr;
+    private final WebSocketConfig wc;
+
+ // 상태를 유지하기 위한 변수
+    private List<Object[]> results;
+    private int index = 0;
+
+    @Scheduled(fixedRate = 10000) // 10초 간격으로 실행
+    public void scheduledSendQueryResults() {
+        if (results == null || results.isEmpty()) {
+            return; // 데이터가 없거나 초기화되지 않은 경우 작업을 종료
+        }
+
+        if (index < results.size()) {
+            Object[] result = results.get(index);
+            wc.sendPushMessage(
+                RealtimeDTO.builder()
+                    .asset_id(result[0].toString())
+                    .created_at((Integer) result[1])
+                    .spectrum_x((Float) result[2])
+                    .spectrum_y((Float) result[3])
+                    .spectrum_z((Float) result[4])
+                    .build()
+            );
+            index++;
+        } else {
+            // 데이터 전송이 완료되면 결과를 초기화하거나 적절히 처리
+            // 예를 들어, 데이터를 다시 초기화할 수도 있음
+            // this.results = null; // 결과를 비워서 다음 호출에서 새 데이터를 요청하도록 함
+            index = 0; // 인덱스 재설정
+        }
+    }
+}

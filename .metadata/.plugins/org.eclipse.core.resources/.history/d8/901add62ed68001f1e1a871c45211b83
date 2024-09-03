@@ -1,0 +1,5 @@
+package com.motorPM.controller;
+
+public class WebSocketController {
+
+}

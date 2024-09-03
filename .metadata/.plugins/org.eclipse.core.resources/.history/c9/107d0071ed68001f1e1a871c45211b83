@@ -1,0 +1,22 @@
+package com.motorPM.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import com.motorPM.service.WebSocketService;
+
+import lombok.RequiredArgsConstructor;
+
+@Controller
+@RequiredArgsConstructor
+public class WebSocketController {
+
+	private final WebSocketService;
+	
+	
+	@PostMapping("/test")
+	public String sendQueryWebSocket(@RequestBody String asset_id) {
+		
+	}
+}

@@ -1,0 +1,18 @@
+package com.motorPM.controller;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.motorPM.domain.DTO.AssetIDDTO;
+import com.motorPM.service.WebSocketService;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequiredArgsConstructor
+public class WebSocketController {
+
+	private final WebSocketService ws;
+	
+}
