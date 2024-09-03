@@ -1,0 +1,50 @@
+package com.motorPM.config.interceptor;
+
+import java.util.Map;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.server.HandshakeInterceptor;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+
+@Component
+public class JWTInterceptor implements HandshakeInterceptor {
+
+	@Override
+	public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
+			Map<String, Object> attributes) throws Exception {
+		HttpHeaders headers = request.getHeaders();
+		
+		// 헤더에서 JWT 토큰 추출
+		String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
+
+		// 추출된 JWT 토큰 디코딩
+		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+			String jwtToken = authHeader.substring(7);
+			String userid = JWT.require(
+					Algorithm.HMAC256("com.predictivemaintenanceproject.backend"))
+					.build()
+					.verify(jwtToken)
+					.getClaim("userid")
+					.asString();
+			if (userid != null) {
+				// 인증된 사용자의 userid를 attributes에 추가.
+				attributes.put("userid", userid);
+				return true;
+			}
+		}
+		return false; // 실패시 핸드셰이크 중단
+	}
+
+	@Override
+	public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
+			Exception exception) {
+
+	}
+
+}

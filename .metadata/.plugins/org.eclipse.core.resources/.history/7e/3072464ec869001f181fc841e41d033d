@@ -1,0 +1,5 @@
+package com.motorPM.domain.DTO;
+
+public class ChartDTO {
+
+}

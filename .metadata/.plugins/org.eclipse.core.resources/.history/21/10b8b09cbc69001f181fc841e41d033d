@@ -1,0 +1,7 @@
+package com.motorPM.config.interceptor;
+
+import org.springframework.web.socket.server.HandshakeInterceptor;
+
+public class JWTInterceptor implements HandshakeInterceptor {
+
+}

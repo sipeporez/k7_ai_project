@@ -18,7 +18,8 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 	@Query(nativeQuery = true, 
 			value = "SELECT asset_id, created_at, spectrum_x_amp, spectrum_y_amp, spectrum_z_amp "
 					+ "FROM realtime_wavedata "
-					+ "WHERE asset_id = :asset_id")
+					+ "WHERE asset_name = :asset_name " 
+					+ "ORDER BY asset_id, created_at")
 	List<Object[]> realDataResult(
-			@Param("asset_id") String asset_id);
+			@Param("asset_name") String asset_name);
 }

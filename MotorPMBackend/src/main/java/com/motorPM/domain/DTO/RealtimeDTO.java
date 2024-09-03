@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-//BE가 연결된 FE에게 전달하는 데이터 클래스 정의
+// 실시간 차트용 DTO
 @Getter
 @Setter
 @ToString

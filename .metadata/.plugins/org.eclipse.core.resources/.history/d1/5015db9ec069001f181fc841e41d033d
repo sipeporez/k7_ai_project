@@ -1,0 +1,104 @@
+package com.motorPM.config;
+
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.motorPM.domain.DTO.RealtimeDTO;
+import com.motorPM.persistence.MemberRepository;
+
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@EnableScheduling
+@RequiredArgsConstructor
+public class CustomWebSocketHandler extends TextWebSocketHandler {
+
+    // 세션을 사용자 이름으로 관리하기 위한 매핑
+    private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+	private final MemberRepository mr;
+	private List<Object[]> results;
+	private int index;
+
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        Map<String, Object> attributes = session.getAttributes();
+        String userid = (String) attributes.get("userid");
+
+        if (userid != null) {
+            // 사용자 이름으로 세션 관리
+            sessions.put(userid, session);
+    		System.out.println(session + userid + " 클라이언트 접속");
+        } else {
+            session.close(CloseStatus.BAD_DATA); // 사용자 이름이 없으면 연결 종료
+        }
+    }
+
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        // 메시지 처리 로직
+        String payload = message.getPayload();
+        Map<String, Object> attributes = session.getAttributes();
+        String userid = (String) attributes.get("userid");
+
+        // 메시지를 받았을 때의 처리 예시
+        if (userid != null) {
+            System.out.println("Received message from " + userid + ": " + payload);
+    		results = mr.realDataResult(message.getPayload());
+    		index = 0;
+        }
+    }
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        Map<String, Object> attributes = session.getAttributes();
+        String userid = (String) attributes.get("userid");
+
+        if (userid != null) {
+            sessions.remove(userid); // 세션 종료 시 제거
+    		System.out.println(session + userid + " 클라이언트 접속 해제");
+        }
+    }
+    
+ // sendPushMessage를 0.781초 단위로 스케쥴링하여 호출하는 메서드
+ 	@Scheduled(fixedRate = 781)
+ 	public void getResults() {
+ 		if (results == null || results.isEmpty()) {
+ 			return; // 결과가 없으면 작업 종료
+ 		}
+ 		if (index < results.size()) {
+ 			Object[] result = results.get(index);
+ 			sendMessageToUser(
+ 					RealtimeDTO.builder()
+ 					.asset_id(result[0].toString())
+ 					.created_at((Integer) result[1])
+ 					.spectrum_x((Float) result[2])
+ 					.spectrum_y((Float) result[3])
+ 					.spectrum_z((Float) result[4])
+ 					.build());
+ 			index++;
+ 		} else
+ 			index = 0;
+ 	}
+
+    // 추가적인 메서드 (예: 특정 사용자에게 메시지 보내기)
+    public void sendMessageToUser(String userid, RealtimeDTO data) {
+        WebSocketSession session = sessions.get(userid);
+        if (session != null && session.isOpen()) {
+            try {
+            	ObjectMapper objectMapper = new ObjectMapper();
+                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(data)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}

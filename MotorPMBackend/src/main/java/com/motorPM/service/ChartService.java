@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.motorPM.domain.DTO.BookmarkDTO;
+import com.motorPM.domain.DTO.ChartDTO;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -36,11 +38,11 @@ public class ChartService {
 	private final EntityManager em;
 
 	// 기간과 asset_name, 조회할 컬럼을 받아서 SigData를 조회하는 메서드
-	public List<Map<String, Object>> getSigdataChart(Object sig) {
+	public List<Map<String, Object>> getSigdataChart(ChartDTO data) {
 
 		ObjectMapper mapper = new ObjectMapper();
 		// Object를 JsonNode로 변환
-		JsonNode jsonData = mapper.convertValue(sig, JsonNode.class);
+		JsonNode jsonData = mapper.convertValue(data, JsonNode.class);
 
 		String asset_name = jsonData.path("asset_name").asText();
 		int startTime = jsonData.path("start_at").asInt();
@@ -81,17 +83,72 @@ public class ChartService {
 		}
 		return list;
 	}
+	
+	// 기간과 asset_name, 조회할 컬럼을 받아서 detailData를 조회하는 메서드
+	public List<Map<String, Object>> getDetailData(ChartDTO data) {
+		
+		ObjectMapper mapper = new ObjectMapper();
+		// Object를 JsonNode로 변환
+		JsonNode jsonData = mapper.convertValue(data, JsonNode.class);
+		
+		String asset_id = jsonData.path("asset_id").asText();
+		int created_at = jsonData.path("created_at").asInt();
+		
+		// sql 쿼리문 작성
+		String query = "SELECT asset_id, created_at, spectrum_x_amp, spectrum_y_amp, spectrum_z_amp " 
+				+ "FROM pm_data.ics_asset_wavedata "
+				+ "WHERE asset_id = :asset_id AND created_at = :created_at";
+		Query sql = em.createNativeQuery(query);
+		sql.setParameter("asset_id", asset_id);
+		sql.setParameter("created_at", created_at);
+		
+		@SuppressWarnings("unchecked")
+		List<Object[]> results = sql.getResultList();
+		List<Map<String, Object>> list = new ArrayList<>();
+		
+		// 쿼리 결과를 저장
+		for (Object[] result : results) {
+			Map<String, Object> map = new LinkedHashMap<>();
+			map.put("asset_id", result[0]);
+			map.put("created_at", result[1]);
+			
+			// String 타입의 데이터를 쉼표로 구분하고 자른 뒤 Double 타입으로 반환
+			List<Double> spectrum_x_amp = Arrays.stream
+					(result[2].toString().split(","))
+					.map(String::trim)
+					.map(Double::parseDouble)
+					.collect(Collectors.toList());
+			map.put("spectrum_x_amp", spectrum_x_amp);
+			
+			List<Double> spectrum_y_amp = Arrays.stream
+					(result[3].toString().split(","))
+					.map(String::trim)
+					.map(Double::parseDouble)
+					.collect(Collectors.toList());
+			map.put("spectrum_y_amp", spectrum_y_amp);
+			
+			List<Double> spectrum_z_amp = Arrays.stream
+					(result[4].toString().split(","))
+					.map(String::trim)
+					.map(Double::parseDouble)
+					.collect(Collectors.toList());
+			map.put("spectrum_z_amp", spectrum_z_amp);
+
+			list.add(map);
+		}
+		return list;
+	}
 
 	// 기간과 asset_name, 조회할 컬럼을 받아서 bookmark에 저장하는 메서드
 	// userid 인증 안될 경우 401, 성공할 경우 200
 	@Transactional
-	public int saveBookmark(Object sig) {
+	public int saveBookmark(BookmarkDTO data) {
 		String userid = getUserIDFromToken();
 		if (userid == null) return HttpStatus.UNAUTHORIZED.value();
 
 		ObjectMapper mapper = new ObjectMapper();
 		// Object를 JsonNode로 변환
-		JsonNode jsonData = mapper.convertValue(sig, JsonNode.class);
+		JsonNode jsonData = mapper.convertValue(data, JsonNode.class);
 
 		String asset_name = jsonData.path("asset_name").asText();
 		int startTime = jsonData.path("start_at").asInt();
