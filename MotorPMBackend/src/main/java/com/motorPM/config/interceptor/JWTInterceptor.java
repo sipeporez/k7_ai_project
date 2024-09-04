@@ -20,7 +20,7 @@ public class JWTInterceptor implements HandshakeInterceptor {
 			Map<String, Object> attributes) throws Exception {
 		// 쿼리스트링으로 JWT 토큰 추출
 		String auth = request.getURI().getQuery().substring(5);
-		// 추출된 JWT 토큰 디코딩
+		// 추출된 JWT 토큰 디코딩 후 userid로 세션 생성
 		if (auth != null && auth.startsWith("Bearer ")) {
 			String jwtToken = auth.substring(7);
 			String userid = JWT.require(

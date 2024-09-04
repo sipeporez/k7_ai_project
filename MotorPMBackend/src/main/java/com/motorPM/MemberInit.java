@@ -23,18 +23,17 @@
 //	public void run(ApplicationArguments args) throws Exception {
 //		try {
 //			mr.save(Member.builder()
-//					.userid("test")
-//					.username("테스트유저1")
+//					.userid("aaaa")
+//					.username("테스트유저2")
 //					.password(enc.encode("11"))
 //					.login_date(LocalDateTime.now())
 //					.phone("01012340000")
 //					.build());
 //			mr.save(Member.builder()
-//					.userid("admin")
-//					.username("어드민")
+//					.userid("bbbb")
+//					.username("테스트유저3")
 //					.password(enc.encode("11"))
 //					.login_date(LocalDateTime.now())
-//					.role(Role.ROLE_ADMIN)
 //					.phone("01000001111")
 //					.build());
 //		}

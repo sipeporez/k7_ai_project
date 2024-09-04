@@ -41,7 +41,7 @@ public class ChartService {
 	public List<Map<String, Object>> getSigdataChart(ChartDTO data) {
 
 		ObjectMapper mapper = new ObjectMapper();
-		// Object를 JsonNode로 변환
+		// ChartDTO를 JsonNode로 변환
 		JsonNode jsonData = mapper.convertValue(data, JsonNode.class);
 
 		String asset_name = jsonData.path("asset_name").asText();
@@ -88,7 +88,7 @@ public class ChartService {
 	public List<Map<String, Object>> getDetailData(ChartDTO data) {
 		
 		ObjectMapper mapper = new ObjectMapper();
-		// Object를 JsonNode로 변환
+		// ChartDTO를 JsonNode로 변환
 		JsonNode jsonData = mapper.convertValue(data, JsonNode.class);
 		
 		String asset_id = jsonData.path("asset_id").asText();
@@ -147,7 +147,7 @@ public class ChartService {
 		if (userid == null) return HttpStatus.UNAUTHORIZED.value();
 
 		ObjectMapper mapper = new ObjectMapper();
-		// Object를 JsonNode로 변환
+		// ChartDTO를 JsonNode로 변환
 		JsonNode jsonData = mapper.convertValue(data, JsonNode.class);
 
 		String asset_name = jsonData.path("asset_name").asText();
@@ -216,12 +216,12 @@ public class ChartService {
 	// 토큰 기반으로 userid의 regidate에 해당하는 북마크를 삭제하는 메서드
 	// userid 인증 안될 경우 401, 성공할 경우 200
 	@Transactional
-	public int deleteBookmark(Object delbook) {
+	public int deleteBookmark(BookmarkDTO delbook) {
 		String userid = getUserIDFromToken();
 		if (userid == null) return HttpStatus.UNAUTHORIZED.value();
 		
 		ObjectMapper mapper = new ObjectMapper();
-		// Object를 JsonNode로 변환
+		// ChartDTO를 JsonNode로 변환
 		JsonNode jsonData = mapper.convertValue(delbook, JsonNode.class);
 		
 		// regidate 배열을 추출
