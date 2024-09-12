@@ -11,6 +11,7 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
 import com.motorPM.config.filter.JWTAuthenFilter;
 import com.motorPM.config.filter.JWTAuthoFilter;
+import com.motorPM.config.filter.JWTExceptionFilter;
 import com.motorPM.persistence.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class SecurityConfig {
 	
 	private final MemberRepository mr;
 	private final AuthenticationConfiguration authcon;
+	private final JWTExceptionFilter jwtExcep;
 	
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,6 +40,8 @@ public class SecurityConfig {
 		http.sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		
 		http.addFilterBefore(new JWTAuthoFilter(mr), AuthorizationFilter.class);
+		
+		http.addFilterBefore(jwtExcep, JWTAuthenFilter.class); // 토큰 기간만료 예외처리 필터
 		
 		http.addFilter(new JWTAuthenFilter(authcon.getAuthenticationManager()));
 		

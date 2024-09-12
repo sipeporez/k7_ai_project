@@ -84,7 +84,7 @@ public class ChartService {
 		return list;
 	}
 	
-	// 기간과 asset_name, 조회할 컬럼을 받아서 detailData를 조회하는 메서드
+	// 기간과 asset_name, 조회할 컬럼을 받아서 detailData(wave_data)를 조회하는 메서드
 	public List<Map<String, Object>> getDetailData(ChartDTO data) {
 		
 		ObjectMapper mapper = new ObjectMapper();

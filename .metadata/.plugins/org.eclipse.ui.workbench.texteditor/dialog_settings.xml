@@ -8,6 +8,8 @@
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="AssetIDDTO"/>
+			<item value="sonNod"/>
 			<item value="asset_data"/>
 			<item value="sig"/>
 			<item value="array"/>
@@ -21,8 +23,6 @@
 			<item value="float"/>
 			<item value="\r\n"/>
 			<item value="&#x09;"/>
-			<item value=" &#x09;"/>
-			<item value="encoder"/>
 		</list>
 		<list key="replacehistory">
 			<item value="data"/>

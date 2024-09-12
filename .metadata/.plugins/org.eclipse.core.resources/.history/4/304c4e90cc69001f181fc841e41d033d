@@ -1,9 +1,0 @@
-package com.motorPM.domain.DTO;
-
-public class BookmarkDTO {
-	
-	private String asset_name;
-	private String query;
-	private String nickname;
-
-}
