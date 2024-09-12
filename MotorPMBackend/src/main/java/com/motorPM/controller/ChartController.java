@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.motorPM.domain.DTO.BookmarkDTO;
 import com.motorPM.domain.DTO.ChartDTO;
-import com.motorPM.persistence.MemberRepository;
 import com.motorPM.service.ChartService;
-import com.motorPM.service.WebSocketService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,12 +17,6 @@ import lombok.RequiredArgsConstructor;
 public class ChartController {
 
 	private final ChartService cs;
-	private final WebSocketService ws;
-	
-	@GetMapping("/test") // GET에서 POST로 변경(컬럼을 배열형식으로 받기 때문)
-	public ResponseEntity<?> getSigdata() {
-		return ResponseEntity.ok(ws.getSpectrum("MILL"));
-	}
 
 	@PostMapping("/charts") // GET에서 POST로 변경(컬럼을 배열형식으로 받기 때문)
 	public ResponseEntity<?> getSigdata(@RequestBody ChartDTO data) {
