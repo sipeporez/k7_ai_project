@@ -15,5 +15,4 @@ public class BookmarkDTO {
 	private String bookmark_name;
 	private List<String> cols;
 	private List<String> regidate;
-
 }

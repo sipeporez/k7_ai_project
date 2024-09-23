@@ -14,7 +14,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.motorPM.domain.DTO.SpectrumDTO;
+import com.motorPM.domain.DTO.WaveformDTO;
 import com.motorPM.service.WebSocketService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class CustomWebSocketHandler extends TextWebSocketHandler {
 	// 세션을 사용자 이름으로 관리하기 위한 매핑
 	private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>(); // 사용자별 세션 관리
-	private final Map<String, List<SpectrumDTO>> userResults = new ConcurrentHashMap<>(); // 사용자별 결과 관리
+	private final Map<String, List<WaveformDTO>> userResults = new ConcurrentHashMap<>(); // 사용자별 결과 관리
 	private final Map<String, Integer> userIndexes = new ConcurrentHashMap<>(); // 사용자별 인덱스 관리
 
 	private final WebSocketService ws;
@@ -50,7 +50,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 		// 메시지를 받았을 때의 처리 예시
 		if (userid != null) {
 			System.out.println(userid + " 클라이언트로부터 받은 메시지 : " + payload);
-			List<SpectrumDTO> results = ws.getSpectrum(payload); // 사용자별 결과 조회
+			List<WaveformDTO> results = ws.getWaveform(payload); // 사용자별 결과 조회
 			userResults.put(userid, results);
 			userIndexes.put(userid, 0);
 		}
@@ -74,14 +74,14 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 			WebSocketSession session = entry.getValue();
 
 			// 현재 사용자에 대한 sql query 결과와 index를 가져옴
-			List<SpectrumDTO> results = userResults.get(userid);
+			List<WaveformDTO> results = userResults.get(userid);
 			Integer index = userIndexes.get(userid);
 
 			// query 결과와 index가 null이 아니고 query 결과가 비어있지 않는 경우 실행
 			if (results != null && !results.isEmpty() && index != null) {
 				if (index >= results.size()) closeSession(session, userid); // 인덱스가 리스트의 크기를 초과하는 경우 세션을 종료
 				else { // 인덱스가 리스트의 크기보다 작은 경우 results에 저장된 query 결과를 message로 전송
-					SpectrumDTO result = results.get(index);
+					WaveformDTO result = results.get(index);
 					sendMessageToUser(session, result); // 각 사용자에게 개별 차트 데이터 전송
 					userIndexes.put(userid, index + 1); // 스케쥴링 1회당 1번씩 출력 후 인덱스 증가
 				}
@@ -90,7 +90,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 	}
 
 	// 특정 사용자(세션)에게 JSON 형태의 메시지 보내기
-	public void sendMessageToUser(WebSocketSession session, SpectrumDTO dto) {
+	public void sendMessageToUser(WebSocketSession session, WaveformDTO dto) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			session.sendMessage(new TextMessage(mapper.writeValueAsString(dto)));
