@@ -9,7 +9,7 @@ import lombok.ToString;
 @Getter @Setter @ToString
 public class BookmarkDTO {
 	
-	private String asset_name;
+	private String asset_id;
 	private Integer start_at;
 	private Integer end_at;
 	private String bookmark_name;

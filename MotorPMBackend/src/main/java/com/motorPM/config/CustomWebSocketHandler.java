@@ -65,7 +65,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 	}
 
 	// sendPushMessage를 0.781초 단위로 스케쥴링하여 호출하는 메서드
-	@Scheduled(fixedRate = 781)
+	@Scheduled(fixedRate = 100)
 	public void getResults() {
 		// 현재 연결된 모든 웹소켓을 순회
 		for (Map.Entry<String, WebSocketSession> entry : sessions.entrySet()) {
