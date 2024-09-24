@@ -30,6 +30,7 @@ public class WebSocketService {
 		}
 		return list;
 	}
+	
 	public List<WaveformDTO> getWaveform(String message) {
 		List<WaveformDTO> list = new ArrayList<>();
 		List<Object[]> result = mr.realDataWaveResult(message);
@@ -44,4 +45,5 @@ public class WebSocketService {
 		}
 		return list;
 	}
+
 }

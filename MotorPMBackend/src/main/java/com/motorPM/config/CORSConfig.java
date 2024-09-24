@@ -18,24 +18,23 @@ public class CORSConfig implements WebMvcConfigurer {
 //				 .allowedHeaders(CorsConfiguration.ALL) // 모든 헤더를 허용
 //				 .allowCredentials(true) // 쿠키와 같은 자격증명을 포함한 요청 허용
 //				 .exposedHeaders(CorsConfiguration.ALL); // 클라이언트가 접근할 수 있는 응답 헤더
-		 
+		 		
 		registry.addMapping("/login")
-				.allowCredentials(true)
-				.exposedHeaders(HttpHeaders.AUTHORIZATION) 
-				.allowedMethods(
-						HttpMethod.GET.name(),
-						HttpMethod.POST.name(),
-						HttpMethod.OPTIONS.name()
-						)
-				.allowedOrigins(
-						"http://localhost:8080",
-						"http://localhost:3000",
-						"http://127.0.0.1:3000",
-						"http://192.168.0.126:3000",
-						"http://192.168.0.144.nip.io:3000",
-						"http://192.168.0.126.nip.io:3000",
-						"http://192.168.0.144:3000"
-						);
+		.allowCredentials(true)
+		.exposedHeaders(HttpHeaders.AUTHORIZATION) 
+		.allowedMethods(
+				HttpMethod.POST.name()
+				)
+		.allowedOrigins(
+				"http://localhost:8080",
+				"http://localhost:3000",
+				"http://127.0.0.1:3000",
+				"http://192.168.0.126:3000",
+				"http://192.168.0.144.nip.io:3000",
+				"http://192.168.0.126.nip.io:3000",
+				"http://192.168.0.144:3000"
+				);
+		
 		registry.addMapping("/charts/**")
 		.allowCredentials(true)
 		.allowedHeaders(
@@ -44,6 +43,44 @@ public class CORSConfig implements WebMvcConfigurer {
 				)
 		.allowedMethods(
 				HttpMethod.GET.name(),
+				HttpMethod.POST.name()
+				)
+		.allowedOrigins(
+				"http://localhost:8080",
+				"http://localhost:3000",
+				"http://127.0.0.1:3000",
+				"http://192.168.0.126:3000",
+				"http://192.168.0.144.nip.io:3000",
+				"http://192.168.0.126.nip.io:3000",
+				"http://192.168.0.144:3000"
+				);
+		
+		registry.addMapping("/tempvolt")
+		.allowCredentials(true)
+		.allowedHeaders(
+				HttpHeaders.AUTHORIZATION,
+				HttpHeaders.CONTENT_TYPE
+				)
+		.allowedMethods(
+				HttpMethod.POST.name()
+				)
+		.allowedOrigins(
+				"http://localhost:8080",
+				"http://localhost:3000",
+				"http://127.0.0.1:3000",
+				"http://192.168.0.126:3000",
+				"http://192.168.0.144.nip.io:3000",
+				"http://192.168.0.126.nip.io:3000",
+				"http://192.168.0.144:3000"
+				);
+		
+		registry.addMapping("/waveform")
+		.allowCredentials(true)
+		.allowedHeaders(
+				HttpHeaders.AUTHORIZATION,
+				HttpHeaders.CONTENT_TYPE
+				)
+		.allowedMethods(
 				HttpMethod.POST.name()
 				)
 		.allowedOrigins(
