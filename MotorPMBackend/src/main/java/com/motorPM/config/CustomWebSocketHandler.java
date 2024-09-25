@@ -14,7 +14,9 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.motorPM.domain.DTO.WaveformDTO;
+import com.motorPM.domain.DTO.WaveDataArrayDTO;
+import com.motorPM.domain.DTO.WaveDataDTO;
+import com.motorPM.service.MainPageService;
 import com.motorPM.service.WebSocketService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,10 +27,14 @@ import lombok.RequiredArgsConstructor;
 public class CustomWebSocketHandler extends TextWebSocketHandler {
 	// 세션을 사용자 이름으로 관리하기 위한 매핑
 	private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>(); // 사용자별 세션 관리
-	private final Map<String, List<WaveformDTO>> userResults = new ConcurrentHashMap<>(); // 사용자별 결과 관리
+	private final Map<String, List<WaveDataDTO>> dataResults = new ConcurrentHashMap<>(); // 사용자별 결과 관리
+	private final Map<String, WaveDataArrayDTO> arrayResults = new ConcurrentHashMap<>(); // 사용자별 결과 관리
 	private final Map<String, Integer> userIndexes = new ConcurrentHashMap<>(); // 사용자별 인덱스 관리
 
+	private int x = 0;
+	
 	private final WebSocketService ws;
+	private final MainPageService ms;
 
 	// 클라이언트와 연결이 된 후에 실행되는 메서드
 	@Override
@@ -50,9 +56,23 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 		// 메시지를 받았을 때의 처리 예시
 		if (userid != null) {
 			System.out.println(userid + " 클라이언트로부터 받은 메시지 : " + payload);
-			List<WaveformDTO> results = ws.getWaveform(payload); // 사용자별 결과 조회
-			userResults.put(userid, results);
-			userIndexes.put(userid, 0);
+			// message = assetid, DYNAMIC(STATIC), wave(spec)
+			String[] gubun = payload.split(", ");
+			switch (gubun[1]) {
+			case "DYNAMIC":
+				clearSession(userid);
+				List<WaveDataDTO> results = ws.getWaveData(gubun[0], gubun[2]); // 사용자별 결과 조회
+				dataResults.put(userid, results);
+				userIndexes.put(userid, 0);
+				break;
+			case "STATIC":
+				clearSession(userid);
+				x = 0;
+				WaveDataArrayDTO arr = ms.getWaveform(gubun[0], gubun[2]);
+				arrayResults.put(userid, arr);
+				userIndexes.put(userid, 0);
+				break;
+			}
 		}
 	}
 
@@ -69,28 +89,41 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 	public void getResults() {
 		// 현재 연결된 모든 웹소켓을 순회
 		for (Map.Entry<String, WebSocketSession> entry : sessions.entrySet()) {
-			// 현재 사용자에 대한 userid와 session값을 불러옴
 			String userid = entry.getKey();
 			WebSocketSession session = entry.getValue();
 
-			// 현재 사용자에 대한 sql query 결과와 index를 가져옴
-			List<WaveformDTO> results = userResults.get(userid);
-			Integer index = userIndexes.get(userid);
+			// 사용자가 데이터를 요청한 경우에만 처리
+			if (dataResults.containsKey(userid)) { // gubunWaveSpec에 데이터가 없으면 건너뜀
+				// WaveformDTO 처리 로직
+				List<WaveDataDTO> results = dataResults.get(userid);
+				
+				Integer index = userIndexes.get(userid);
 
-			// query 결과와 index가 null이 아니고 query 결과가 비어있지 않는 경우 실행
-			if (results != null && !results.isEmpty() && index != null) {
-				if (index >= results.size()) closeSession(session, userid); // 인덱스가 리스트의 크기를 초과하는 경우 세션을 종료
-				else { // 인덱스가 리스트의 크기보다 작은 경우 results에 저장된 query 결과를 message로 전송
-					WaveformDTO result = results.get(index);
-					sendMessageToUser(session, result); // 각 사용자에게 개별 차트 데이터 전송
-					userIndexes.put(userid, index + 1); // 스케쥴링 1회당 1번씩 출력 후 인덱스 증가
+				if (results != null && !results.isEmpty() && index != null) {
+					if (index >= results.size()) {
+						closeSession(session, userid);
+					} else {
+						WaveDataDTO result = results.get(index);
+						sendMessageToUser(session, result);
+						userIndexes.put(userid, index + 1);
+					}
+				}
+			}
+			// 사용자가 데이터를 요청한 경우에만 처리
+			else if (arrayResults.containsKey(userid)) { // gubunWaveSpec에 데이터가 없으면 건너뜀
+				// WaveformDTO 처리 로직
+				WaveDataArrayDTO results = arrayResults.get(userid);
+				if (results != null) {
+					if (x < 10) sendMessageToUser(session, results);	// 10번 전송(추후 삭제할 것)
+					else clearSession(userid);
+					}
+				x++;
 				}
 			}
 		}
-	}
-
+	
 	// 특정 사용자(세션)에게 JSON 형태의 메시지 보내기
-	public void sendMessageToUser(WebSocketSession session, WaveformDTO dto) {
+	public void sendMessageToUser(WebSocketSession session, Object dto) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			session.sendMessage(new TextMessage(mapper.writeValueAsString(dto)));
@@ -99,13 +132,24 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 		}
 	}
 
-	// 세션 종료 및 데이터 정리 메서드
+	// 매핑 데이터 정리 메서드
+	public void clearSession(String userid) {
+		try {
+			dataResults.remove(userid); // 사용자의 결과 제거
+			arrayResults.remove(userid);
+			userIndexes.remove(userid); // 사용자의 인덱스 제거
+		}
+		catch (Exception e) {
+			System.out.println(userid + "클리어 중 에러 발생");
+			e.printStackTrace();
+		}
+	}
+	// 세션 종료 메서드
 	public void closeSession(WebSocketSession session, String userid) {
 		try {
 			session.close(CloseStatus.NORMAL); // 정상적으로 세션을 종료
 			sessions.remove(userid); // 세션 맵에서 제거
-			userResults.remove(userid); // 사용자의 결과 제거
-			userIndexes.remove(userid); // 사용자의 인덱스 제거
+			clearSession(userid);
 			System.out.println(userid + " 클라이언트 접속 해제");
 		}
 		catch (IOException e) {

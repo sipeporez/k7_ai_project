@@ -14,10 +14,10 @@ import lombok.ToString;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SpectrumDTO {
+public class WaveDataDTO {
 	private String asset_id;
 	private Integer created_at;
-	private Float spectrum_x;
-	private Float spectrum_y;
-	private Float spectrum_z;
+	private Float x;
+	private Float y;
+	private Float z;
 }

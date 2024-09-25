@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.motorPM.domain.DTO.TempVoltDTO;
-import com.motorPM.domain.DTO.WaveformArrayDTO;
+import com.motorPM.domain.DTO.WaveDataArrayDTO;
 import com.motorPM.persistence.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,9 +29,12 @@ public class MainPageService {
 				.build();
 	}
 	
-	// 파형 차트 메서드
-	public WaveformArrayDTO getWaveform(String asset_id) {
-		Object[] result = (Object[]) mr.WaveformResult(asset_id);
+	// 파형,스펙트럼 데이터 메서드
+	public WaveDataArrayDTO getWaveform(String asset_id, String gubun) {
+		Object[] result = null;
+		if (gubun.equals("WAVEFORM")) result = (Object[]) mr.WaveformResult(asset_id);
+		else if (gubun.equals("SPECTRUM")) result = (Object[]) mr.SpectrumResult(asset_id);
+		
 		List<Float[]> wave = new ArrayList<>(3);
 		
 		for (int i = 2; i < 5; i++) {
@@ -44,13 +47,12 @@ public class MainPageService {
 			wave.add(floatArr);
         }
 
-		return WaveformArrayDTO.builder()
+		return WaveDataArrayDTO.builder()
 				.asset_id(result[0].toString())
 				.created_at((Integer) result[1])
-				.waveform_x(wave.get(0))
-				.waveform_y(wave.get(1))
-				.waveform_z(wave.get(2))
+				.x(wave.get(0))
+				.y(wave.get(1))
+				.z(wave.get(2))
 				.build();
 	}
-
 }

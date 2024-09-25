@@ -45,6 +45,16 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 						)
 		Object WaveformResult(
 				@Param("asset_id") String message);
+		
+		// 임시 웨이브 데이터 -> 메인페이지 스펙트럼 차트
+		@Query(nativeQuery = true, 
+				value = "SELECT asset_id, created_at, spectrum_x_amp, spectrum_y_amp, spectrum_z_amp "
+						+ "FROM ics_asset_wavedata "
+						+ "WHERE asset_id = :asset_id "
+						+ "AND created_at = (SELECT max(created_at) FROM ics_asset_wavedata WHERE asset_id = :asset_id) "
+				)
+		Object SpectrumResult(
+				@Param("asset_id") String message);
 	
 	// 임시 temperature, voltage 데이터 -> 메인페이지 차트 옆에 사용
 	@Query(nativeQuery = true,

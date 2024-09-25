@@ -5,8 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.motorPM.domain.DTO.SpectrumDTO;
-import com.motorPM.domain.DTO.WaveformDTO;
+import com.motorPM.domain.DTO.WaveDataDTO;
 import com.motorPM.persistence.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -16,34 +15,21 @@ import lombok.RequiredArgsConstructor;
 public class WebSocketService {
 	private final MemberRepository mr;
 		
-	public List<SpectrumDTO> getSpectrum(String message) {
-		List<SpectrumDTO> list = new ArrayList<>();
-		List<Object[]> result = mr.realDataSpectrumResult(message);
+	public List<WaveDataDTO> getWaveData(String message, String gubun) {
+		List<WaveDataDTO> list = new ArrayList<>();
+		List<Object[]> result = new ArrayList<>();
+		if (gubun.equals("WAVEFORM")) result = mr.realDataWaveResult(message);
+		else if (gubun.equals("SPECTRUM")) result = mr.realDataSpectrumResult(message);
+		
 		for (Object[] row : result) {
-			list.add(SpectrumDTO.builder()
+			list.add(WaveDataDTO.builder()
 					.asset_id(row[0].toString())
 					.created_at((Integer) row[1])
-					.spectrum_x((Float) row[2])
-					.spectrum_y((Float) row[3])
-					.spectrum_z((Float) row[4])
+					.x((Float) row[2])
+					.y((Float) row[3])
+					.z((Float) row[4])
 					.build());
 		}
 		return list;
 	}
-	
-	public List<WaveformDTO> getWaveform(String message) {
-		List<WaveformDTO> list = new ArrayList<>();
-		List<Object[]> result = mr.realDataWaveResult(message);
-		for (Object[] row : result) {
-			list.add(WaveformDTO.builder()
-					.asset_id(row[0].toString())
-					.created_at((Integer) row[1])
-					.waveform_x((Float) row[2])
-					.waveform_y((Float) row[3])
-					.waveform_z((Float) row[4])
-					.build());
-		}
-		return list;
-	}
-
 }

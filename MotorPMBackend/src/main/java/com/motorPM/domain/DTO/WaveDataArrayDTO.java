@@ -14,10 +14,10 @@ import lombok.ToString;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WaveformDTO {
+public class WaveDataArrayDTO {
 	private String asset_id;
 	private Integer created_at;
-	private Float waveform_x;
-	private Float waveform_y;
-	private Float waveform_z;
+	private Float[] x;
+	private Float[] y;
+	private Float[] z;
 }

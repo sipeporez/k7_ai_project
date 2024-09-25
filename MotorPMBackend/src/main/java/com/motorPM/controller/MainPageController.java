@@ -21,10 +21,4 @@ public class MainPageController {
 		return ResponseEntity.ok(ms.getTempVolt(dto.getAsset_id()));
 		
 	}
-	
-	@PostMapping("/waveform") // 메인페이지 파형 그래프 데이터
-	public ResponseEntity<?> getWaveformData(@RequestBody TempVoltDTO dto) {
-		return ResponseEntity.ok(ms.getWaveform(dto.getAsset_id()));
-	}
-	
 }
