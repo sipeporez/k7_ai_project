@@ -30,8 +30,6 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 	private final Map<String, List<WaveDataDTO>> dataResults = new ConcurrentHashMap<>(); // 사용자별 결과 관리
 	private final Map<String, WaveDataArrayDTO> arrayResults = new ConcurrentHashMap<>(); // 사용자별 결과 관리
 	private final Map<String, Integer> userIndexes = new ConcurrentHashMap<>(); // 사용자별 인덱스 관리
-
-	private int x = 0;
 	
 	private final WebSocketService ws;
 	private final MainPageService ms;
@@ -67,7 +65,6 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 				break;
 			case "STATIC":
 				clearSession(userid);
-				x = 0;
 				WaveDataArrayDTO arr = ms.getWaveform(gubun[0], gubun[2]);
 				arrayResults.put(userid, arr);
 				userIndexes.put(userid, 0);
@@ -114,10 +111,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 				// WaveformDTO 처리 로직
 				WaveDataArrayDTO results = arrayResults.get(userid);
 				if (results != null) {
-					if (x < 10) sendMessageToUser(session, results);	// 10번 전송(추후 삭제할 것)
-					else clearSession(userid);
+					sendMessageToUser(session, results);
+					clearSession(userid);
 					}
-				x++;
 				}
 			}
 		}

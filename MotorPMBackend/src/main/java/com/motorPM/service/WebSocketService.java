@@ -18,8 +18,8 @@ public class WebSocketService {
 	public List<WaveDataDTO> getWaveData(String message, String gubun) {
 		List<WaveDataDTO> list = new ArrayList<>();
 		List<Object[]> result = new ArrayList<>();
-		if (gubun.equals("WAVEFORM")) result = mr.realDataWaveResult(message);
-		else if (gubun.equals("SPECTRUM")) result = mr.realDataSpectrumResult(message);
+		if (gubun.trim().equals("WAVEFORM")) result = mr.realDataWaveResult(message);
+		else if (gubun.trim().equals("SPECTRUM")) result = mr.realDataSpectrumResult(message);
 		
 		for (Object[] row : result) {
 			list.add(WaveDataDTO.builder()
