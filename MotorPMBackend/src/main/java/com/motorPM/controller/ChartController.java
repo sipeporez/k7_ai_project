@@ -26,10 +26,10 @@ public class ChartController {
 		
 	}
 	
-//	@PostMapping("/charts/detail")
-//	public ResponseEntity<?> getDetailData(@RequestBody ChartDTO data) {
-//		return ResponseEntity.ok(cs.getDetailData(data));
-//	}
+	@PostMapping("/charts/detail")
+	public ResponseEntity<?> getDetailData(@RequestBody ChartDTO data) {
+		return ResponseEntity.ok(cs.getDetailData(data));
+	}
 	
 	@PostMapping("/charts/savebookmark")
 	public ResponseEntity<?> saveBookmark(@RequestBody BookmarkDTO data) {

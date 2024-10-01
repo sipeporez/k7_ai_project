@@ -80,11 +80,27 @@ public class ChartService {
 		
 		String asset_id = jsonData.path("asset_id").asText();
 		int created_at = jsonData.path("created_at").asInt();
+		String gubun = jsonData.path("type").asText();
+		String query = null;
 		
-		// sql 쿼리문 작성
-		String query = "SELECT asset_id, created_at, spectrum_x_amp, spectrum_y_amp, spectrum_z_amp " 
-				+ "FROM pm_data.ics_asset_wavedata "
-				+ "WHERE asset_id = :asset_id AND created_at = :created_at";
+		// 구분자에 따라 웨이브폼과 스펙트럼 쿼리문 분리
+		if (gubun.trim().equals("WAVEFORM")) {
+			query = "SELECT asset_id, created_at, waveform_x, waveform_y, waveform_z " 
+					+ "FROM pm_data.ics_asset_wavedata "
+					+ "WHERE asset_id = :asset_id "
+					+ "AND created_at <= :created_at "
+					+ "ORDER BY created_at desc "
+					+ "LIMIT 1;";
+		}
+		else {
+			query = "SELECT asset_id, created_at, spectrum_x_amp, spectrum_y_amp, spectrum_z_amp " 
+					+ "FROM pm_data.ics_asset_wavedata "
+					+ "WHERE asset_id = :asset_id "
+					+ "AND created_at <= :created_at "
+					+ "ORDER BY created_at desc "
+					+ "LIMIT 1;"; 
+		}
+
 		Query sql = em.createNativeQuery(query);
 		sql.setParameter("asset_id", asset_id);
 		sql.setParameter("created_at", created_at);
@@ -100,26 +116,26 @@ public class ChartService {
 			map.put("created_at", result[1]);
 			
 			// String 타입의 데이터를 쉼표로 구분하고 자른 뒤 Double 타입으로 반환
-			List<Double> spectrum_x_amp = Arrays.stream
+			List<Double> x = Arrays.stream
 					(result[2].toString().split(","))
 					.map(String::trim)
 					.map(Double::parseDouble)
 					.collect(Collectors.toList());
-			map.put("spectrum_x_amp", spectrum_x_amp);
+			map.put("x", x);
 			
-			List<Double> spectrum_y_amp = Arrays.stream
+			List<Double> y = Arrays.stream
 					(result[3].toString().split(","))
 					.map(String::trim)
 					.map(Double::parseDouble)
 					.collect(Collectors.toList());
-			map.put("spectrum_y_amp", spectrum_y_amp);
+			map.put("y", y);
 			
-			List<Double> spectrum_z_amp = Arrays.stream
+			List<Double> z = Arrays.stream
 					(result[4].toString().split(","))
 					.map(String::trim)
 					.map(Double::parseDouble)
 					.collect(Collectors.toList());
-			map.put("spectrum_z_amp", spectrum_z_amp);
+			map.put("z", z);
 
 			list.add(map);
 		}

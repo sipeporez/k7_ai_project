@@ -14,6 +14,21 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 	@Query("SELECT m FROM Member m WHERE m.userid = :userid")
     Optional<Member> findByUserid(@Param("userid") String userid);
 	
+	
+	// 가장 최신의 12개 스펙트럼 데이터 -> 웹서비스에서 사용
+	@Query(nativeQuery = true,
+			value = "SELECT * FROM ( "
+				    + "SELECT asset_id, created_at, " 
+			        + "spectrum_x_amp, spectrum_y_amp, spectrum_z_amp "
+			        + "FROM ics_asset_wavedata "
+			        + "WHERE asset_id = :asset_id "
+			        + "ORDER BY created_at DESC "
+			        + "LIMIT 12) "
+			        + "as subquery "
+			        + "ORDER BY created_at ASC")
+	List<Object[]> lastestSpectrumData(@Param("asset_id") String asset_id);
+	
+	
 	// 임시 스펙트럼 데이터 -> 메인페이지 실시간 차트
 	@Query(nativeQuery = true, 
 			value = "SELECT asset_id, created_at, spectrum_x_amp, spectrum_y_amp, spectrum_z_amp "

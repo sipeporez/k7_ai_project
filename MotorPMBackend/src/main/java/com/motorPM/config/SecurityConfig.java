@@ -30,6 +30,8 @@ public class SecurityConfig {
 		http.authorizeHttpRequests(ah-> ah
 				.requestMatchers("/bookmark/**").authenticated()
 				.requestMatchers("/charts/**").authenticated()
+				.requestMatchers("/tempvolt/**").authenticated()
+				.requestMatchers("/waveform/**").authenticated()
 				.anyRequest().permitAll());
 		
 		http.httpBasic(b->b.disable());

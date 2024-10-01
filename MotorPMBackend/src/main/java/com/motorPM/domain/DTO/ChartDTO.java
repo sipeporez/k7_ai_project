@@ -15,5 +15,6 @@ public class ChartDTO {
 	private Integer end_at;
 	private Integer created_at;
 	private List<String> cols;
+	private String type;
 	
 }

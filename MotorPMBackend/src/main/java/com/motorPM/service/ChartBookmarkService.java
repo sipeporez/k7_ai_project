@@ -73,8 +73,8 @@ public class ChartBookmarkService {	// Jackson 이용
 		if (userid == null)
 			return null;
 
-		String query = "SELECT nickname, cols, asset_id, startTime, endTime, regidate"
-				+ " FROM bookmark WHERE userid = :userid";
+		String query = "SELECT nickname, cols, asset_id, startTime, endTime, DATE_FORMAT(regidate, '%Y-%m-%d %H:%i:%s') as regidate "
+				+ "FROM bookmark WHERE userid = :userid";
 		Query sql = em.createNativeQuery(query);
 		sql.setParameter("userid", userid);
 

@@ -56,19 +56,22 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 			System.out.println(userid + " 클라이언트로부터 받은 메시지 : " + payload);
 			// message = assetid, DYNAMIC(STATIC), wave(spec)
 			String[] gubun = payload.split(", ");
-			switch (gubun[1]) {
-			case "DYNAMIC":
-				clearSession(userid);
-				List<WaveDataDTO> results = ws.getWaveData(gubun[0], gubun[2]); // 사용자별 결과 조회
-				dataResults.put(userid, results);
-				userIndexes.put(userid, 0);
-				break;
-			case "STATIC":
-				clearSession(userid);
-				WaveDataArrayDTO arr = ms.getWaveform(gubun[0], gubun[2]);
-				arrayResults.put(userid, arr);
-				userIndexes.put(userid, 0);
-				break;
+			if (gubun[0].equalsIgnoreCase("STOP")) clearSession(userid);
+			else {
+				switch (gubun[1]) {
+				case "DYNAMIC":
+					clearSession(userid);
+					List<WaveDataDTO> results = ws.getWaveData(gubun[0], gubun[2]); // 사용자별 결과 조회
+					dataResults.put(userid, results);
+					userIndexes.put(userid, 0);
+					break;
+				case "STATIC":
+					clearSession(userid);
+					WaveDataArrayDTO arr = ms.getWaveform(gubun[0], gubun[2]);
+					arrayResults.put(userid, arr);
+					userIndexes.put(userid, 0);
+					break;
+				}
 			}
 		}
 	}
