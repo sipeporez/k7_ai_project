@@ -31,6 +31,11 @@ public class ChartController {
 		return ResponseEntity.ok(cs.getDetailData(data));
 	}
 	
+	@PostMapping("/charts/detailAll")
+	public ResponseEntity<?> getDetailDataAll(@RequestBody ChartDTO data) {
+		return ResponseEntity.ok(cs.getDetailDataAll(data));
+	}
+	
 	@PostMapping("/charts/savebookmark")
 	public ResponseEntity<?> saveBookmark(@RequestBody BookmarkDTO data) {
 		return ResponseEntity.status(cbs.saveBookmark(data)).body(null);
