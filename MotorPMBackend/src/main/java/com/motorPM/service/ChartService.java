@@ -223,5 +223,65 @@ public class ChartService {
 		}
 		return list;
 	}
+	
+	// created_at과 asset_id를 받아서 Flask에 Spectrum을 전달하는 메서드
+	public List<Map<String, Object>> getSpectrumToFlask(ChartDTO data) {
+		
+		ObjectMapper mapper = new ObjectMapper();
+		// ChartDTO를 JsonNode로 변환
+		JsonNode jsonData = mapper.convertValue(data, JsonNode.class);
+		
+		String asset_id = jsonData.path("asset_id").asText();
+		int created_at = jsonData.path("created_at").asInt();
+		String gubun = jsonData.path("type").asText();
+		String query = null;
+		
+		query = "SELECT asset_id, created_at, spectrum_x_amp, spectrum_y_amp, spectrum_z_amp " 
+				+ "FROM pm_data.ics_asset_wavedata "
+				+ "WHERE asset_id = :asset_id "
+				+ "AND created_at <= :created_at "
+				+ "ORDER BY created_at desc "
+				+ "LIMIT 1;"; 
+		
+		Query sql = em.createNativeQuery(query);
+		sql.setParameter("asset_id", asset_id);
+		sql.setParameter("created_at", created_at);
+		
+		@SuppressWarnings("unchecked")
+		List<Object[]> results = sql.getResultList();
+		List<Map<String, Object>> list = new ArrayList<>();
+		
+		// 쿼리 결과를 저장
+		for (Object[] result : results) {
+			Map<String, Object> map = new LinkedHashMap<>();
+			map.put("asset_id", result[0]);
+			map.put("created_at", result[1]);
+			
+			// String 타입의 데이터를 쉼표로 구분하고 자른 뒤 Double 타입으로 반환
+			List<Double> x = Arrays.stream
+					(result[2].toString().split(","))
+					.map(String::trim)
+					.map(Double::parseDouble)
+					.collect(Collectors.toList());
+			map.put("x", x);
+			
+			List<Double> y = Arrays.stream
+					(result[3].toString().split(","))
+					.map(String::trim)
+					.map(Double::parseDouble)
+					.collect(Collectors.toList());
+			map.put("y", y);
+			
+			List<Double> z = Arrays.stream
+					(result[4].toString().split(","))
+					.map(String::trim)
+					.map(Double::parseDouble)
+					.collect(Collectors.toList());
+			map.put("z", z);
+			
+			list.add(map);
+		}
+		return list;
+	}
 
 }

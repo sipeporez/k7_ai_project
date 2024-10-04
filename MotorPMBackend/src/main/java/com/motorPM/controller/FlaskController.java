@@ -12,12 +12,12 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class FlaskController {
-	
 	private final FlaskService fs;
 	
 	@GetMapping("/flask")
-	public ResponseEntity<?> getLastestSpectrum(@RequestParam String asset_id) {
-		return ResponseEntity.ok(fs.getLastestSpectrum(asset_id));
+	public ResponseEntity<?> getMethodName(@RequestParam String asset_id) {
+		
+		return ResponseEntity.ok(fs.getSpectrumDaily(asset_id));
 	}
 	
 

@@ -20,4 +20,5 @@ public class WaveDataArrayDTO {
 	private Float[] x;
 	private Float[] y;
 	private Float[] z;
+	private String model;
 }

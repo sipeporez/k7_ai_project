@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -15,7 +18,9 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.motorPM.domain.DTO.WaveDataArrayDTO;
+import com.motorPM.domain.DTO.WaveDataArrayFlaskDTO;
 import com.motorPM.domain.DTO.WaveDataDTO;
+import com.motorPM.service.FlaskService;
 import com.motorPM.service.MainPageService;
 import com.motorPM.service.WebSocketService;
 
@@ -29,11 +34,27 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 	private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>(); // 사용자별 세션 관리
 	private final Map<String, List<WaveDataDTO>> dataResults = new ConcurrentHashMap<>(); // 사용자별 결과 관리
 	private final Map<String, WaveDataArrayDTO> arrayResults = new ConcurrentHashMap<>(); // 사용자별 결과 관리
+	private final Map<String, String> flaskResult = new ConcurrentHashMap<>(); // 사용자별 결과 관리
 	private final Map<String, Integer> userIndexes = new ConcurrentHashMap<>(); // 사용자별 인덱스 관리
 	
 	private final WebSocketService ws;
 	private final MainPageService ms;
+	private final FlaskService fs;
 
+	// 플라스크에 데이터를 Post 전송하여 모델의 결과를 리턴하는 메서드
+	public String flaskPost(WaveDataArrayFlaskDTO arr) {
+		WebClient fs = WebClient.create("http://localhost:5000/");
+		String flaskResp = fs.post()
+				.uri("/pdm")
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+				.bodyValue(arr)
+				.retrieve()
+				.bodyToMono(String.class)
+				.block();
+		
+		return flaskResp;
+	}
+	
 	// 클라이언트와 연결이 된 후에 실행되는 메서드
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -68,6 +89,8 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 				case "STATIC":
 					clearSession(userid);
 					WaveDataArrayDTO arr = ms.getWaveform(gubun[0], gubun[2]);
+					// 플라스크에 하루치 데이터 전송 후 결과 받아 arr에 추가
+					arr.setModel(flaskPost(fs.getSpectrumDaily(gubun[0]))); 
 					arrayResults.put(userid, arr);
 					userIndexes.put(userid, 0);
 					break;
@@ -130,6 +153,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 			e.printStackTrace();
 		}
 	}
+	
 
 	// 매핑 데이터 정리 메서드
 	public void clearSession(String userid) {
@@ -137,6 +161,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 			dataResults.remove(userid); // 사용자의 결과 제거
 			arrayResults.remove(userid);
 			userIndexes.remove(userid); // 사용자의 인덱스 제거
+			flaskResult.remove(userid);
 		}
 		catch (Exception e) {
 			System.out.println(userid + "클리어 중 에러 발생");
