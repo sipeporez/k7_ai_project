@@ -150,8 +150,6 @@ public class ChartService {
 			}
 			return list;
 		}
-
-	
 	
 	// created_at과 asset_id, 구분자(WAVEFORM,SPECTRUM)를 받아서 detailData(wave_data)를 조회하는 메서드
 	public List<Map<String, Object>> getDetailData(ChartDTO data) {
@@ -233,7 +231,6 @@ public class ChartService {
 		
 		String asset_id = jsonData.path("asset_id").asText();
 		int created_at = jsonData.path("created_at").asInt();
-		String gubun = jsonData.path("type").asText();
 		String query = null;
 		
 		query = "SELECT asset_id, created_at, spectrum_x_amp, spectrum_y_amp, spectrum_z_amp " 

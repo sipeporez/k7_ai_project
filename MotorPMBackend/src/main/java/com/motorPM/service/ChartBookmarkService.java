@@ -26,6 +26,7 @@ public class ChartBookmarkService {	// Jackson 이용
 
 	private final GetToken gt;
 	private final EntityManager em;
+	private final FlaskService fs; // unixtime 변환용
 
 	// 기간과 asset_id, 조회할 컬럼을 받아서 bookmark에 저장하는 메서드
 	// userid 인증 안될 경우 401, 성공할 경우 200
@@ -95,6 +96,8 @@ public class ChartBookmarkService {	// Jackson 이용
 			map.put("startTime", result[3]);
 			map.put("endTime", result[4]);
 			map.put("regidate", result[5]);
+			map.put("startDate", fs.unixToKoreanTime((Integer)result[3]));
+			map.put("endDate", fs.unixToKoreanTime((Integer)result[4]));
 
 			list.add(map);
 		}

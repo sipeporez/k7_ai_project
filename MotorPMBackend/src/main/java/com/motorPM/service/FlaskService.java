@@ -1,10 +1,15 @@
 package com.motorPM.service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.springframework.stereotype.Service;
 
+import com.motorPM.domain.DTO.AnomalyDTO;
 import com.motorPM.domain.DTO.WaveDataArrayFlaskDTO;
 import com.motorPM.persistence.MemberRepository;
 
@@ -17,6 +22,47 @@ import lombok.RequiredArgsConstructor;
 public class FlaskService {
 	
 	private final MemberRepository mr;
+	
+	public String unixToKoreanTime(Integer unixTime) {
+        // 유닉스 타임을 밀리초로 변환
+        long millis = (long) unixTime * 1000;
+
+        // Date 객체 생성
+        Date date = new Date(millis);
+
+        // 한국 시간으로 변환
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
+        calendar.setTime(date);
+
+        // 형식화된 문자열 생성 (예: "yyyy-MM-dd HH:mm:ss")
+        String formattedDate = String.format("%tF %<tT", calendar);
+        return formattedDate;
+    }
+	
+	
+	public void anomalyDetected(String asset_id, Integer created_at, Float model_value) {
+		String[] model_result = {"CRITICAL","INSPECT"};
+		if (model_value <= 0.5 && model_value >= 0.25) 
+			mr.anomalyDectected(asset_id, created_at, model_value, model_result[1]);
+		else if (model_value < 0.25)
+			mr.anomalyDectected(asset_id, created_at, model_value, model_result[0]);
+	}
+	
+	public List<AnomalyDTO> getAnomalyTable() {
+		List<Object[]> results = mr.getAnomalyTable();
+		List<AnomalyDTO> list = new ArrayList<>();
+		for (Object[] res : results) {
+			list.add(AnomalyDTO.builder()
+					.asset_id(res[0].toString())
+					.asset_name(res[1].toString())
+					.created_at(unixToKoreanTime((Integer) res[2]))
+					.detected_date((Timestamp) res[3])
+					.model_value((Float) res[4])
+					.model_result(res[5].toString())
+					.build());
+		}
+		return list;
+	}
 	
 	// 플라스크용 스펙트럼 데이터 메서드 (12개 - 하루치)
 	public WaveDataArrayFlaskDTO getSpectrumDaily(String asset_id) {

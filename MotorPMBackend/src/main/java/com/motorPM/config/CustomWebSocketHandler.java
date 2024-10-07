@@ -80,19 +80,25 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 			if (gubun[0].equalsIgnoreCase("STOP")) clearSession(userid);
 			else {
 				switch (gubun[1]) {
+				// 동적 출력 (스케쥴러 ms 마다 1줄씩 전송)
 				case "DYNAMIC":
 					clearSession(userid);
 					List<WaveDataDTO> results = ws.getWaveData(gubun[0], gubun[2]); // 사용자별 결과 조회
 					dataResults.put(userid, results);
 					userIndexes.put(userid, 0);
 					break;
+				// 정적 출력 (전체 데이터 1번 전송)
 				case "STATIC":
 					clearSession(userid);
 					WaveDataArrayDTO arr = ms.getWaveform(gubun[0], gubun[2]);
 					// 플라스크에 하루치 데이터 전송 후 결과 받아 arr에 추가
-					arr.setModel(flaskPost(fs.getSpectrumDaily(gubun[0]))); 
+					String modelResult = flaskPost(fs.getSpectrumDaily(gubun[0]));
+					// Float 값이 임계치(ex 0.5) 이상인 경우 DB에 저장하기
+					Float modelFloat = Float.parseFloat(modelResult);
+					arr.setModel(modelResult);
 					arrayResults.put(userid, arr);
 					userIndexes.put(userid, 0);
+					fs.anomalyDetected(gubun[0], arr.getCreated_at(), modelFloat);
 					break;
 				}
 			}

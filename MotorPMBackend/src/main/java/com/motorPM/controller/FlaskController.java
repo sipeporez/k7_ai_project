@@ -20,5 +20,9 @@ public class FlaskController {
 		return ResponseEntity.ok(fs.getSpectrumDaily(asset_id));
 	}
 	
+	@GetMapping("/anomaly")
+	public ResponseEntity<?> getAnomalyTable() {
+		return ResponseEntity.ok(fs.getAnomalyTable());
+	}
 
 }

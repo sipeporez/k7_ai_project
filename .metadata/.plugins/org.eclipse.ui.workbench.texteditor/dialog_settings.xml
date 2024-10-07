@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="asset_data"/>
+		<item key="selection" value="hand"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="true"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="AssetIDDTO"/>
-			<item value="sonNod"/>
-			<item value="asset_data"/>
-			<item value="sig"/>
-			<item value="array"/>
-			<item value="arrays"/>
-			<item value="username"/>
-			<item value="if (results == null || results.isEmpty()) {"/>
+			<item value="handsh"/>
+			<item value="hand"/>
+			<item value="before"/>
+			<item value="specResults"/>
+			<item value="waveResults"/>
 			<item value="getResults"/>
-			<item value="initializeData"/>
-			<item value="pushservice"/>
-			<item value="jsonNode"/>
-			<item value="float"/>
-			<item value="\r\n"/>
-			<item value="&#x09;"/>
+			<item value="userResults"/>
+			<item value="ws."/>
+			<item value="ws"/>
+			<item value="asset_id"/>
+			<item value="asset_name"/>
+			<item value="asset_na"/>
+			<item value="trum"/>
+			<item value="spect"/>
+			<item value="spe"/>
 		</list>
 		<list key="replacehistory">
+			<item value="dataResults"/>
 			<item value="data"/>
 			<item value="userid"/>
 			<item value="jsonData"/>

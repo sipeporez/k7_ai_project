@@ -73,6 +73,25 @@ public class CORSConfig implements WebMvcConfigurer {
 				"http://192.168.0.144:3000"
 				);
 		
+		registry.addMapping("/anomaly**")
+		.allowCredentials(true)
+		.allowedHeaders(
+				HttpHeaders.AUTHORIZATION,
+				HttpHeaders.CONTENT_TYPE
+				)
+		.allowedMethods(
+				HttpMethod.GET.name()
+				)
+		.allowedOrigins(
+				"http://localhost:8080",
+				"http://localhost:3000",
+				"http://127.0.0.1:3000",
+				"http://192.168.0.126:3000",
+				"http://192.168.0.144.nip.io:3000",
+				"http://192.168.0.126.nip.io:3000",
+				"http://192.168.0.144:3000"
+				);
+		
 		registry.addMapping("/tempvolt")
 		.allowCredentials(true)
 		.allowedHeaders(
